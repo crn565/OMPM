@@ -1,7 +1,7 @@
 # Open-Multi-Power-Meter
 
 
-## Implementación de Nilmtk  usando  nuevo hardware basado en ESP32 sobre un bus RS485 con 6 medidores PZEM004- 
+## Implementación de Nilmtk  usando  nuevo hardware basado en ESP32 sobre un bus RS485 con 6 medidores PZEM004 
 
 En este repositorio mostramos  la mayoria de posibilidades de NILMTK  usando en lugar de hardware comercial, como primicia un hardware  muy  facil de obtener.
 
