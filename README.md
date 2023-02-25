@@ -1,38 +1,42 @@
 # Open-Multi-Power-Meter
 
 
-## Implementación de Nilmtk  usando  nuevo hardware basado en ESP32 sobre un bus RS485 con 6 medidores PZEM004 
+## Implementación de Nilmtk  usando  nuevo hardware basado en ESP32 sobre un bus RS485 con 6 medidores PZEM004- 
 
 En este repositorio mostramos  la mayoria de posibilidades de NILMTK  usando en lugar de hardware comercial, como primicia un hardware  muy  facil de obtener.
 
-El hardware usado para la adquisicion y captura de las medidas electricas  se basa en  los siguientes componentes:
+El hardware usado para la adquisicion y captura de las medidas eléctricas  se basa en  los siguientes componentes:
 
- - ESP32  node MCU
+ - 1xx ESP32  node MCU.
  
- - 6 x PZEM004
+ - 6 x PZEM004.
  
- - Lector  de tarjetas SD 
+ - 1 x Lector  de tarjetas SD. 
  
- - Tarjeta SD
+ - 1 x Tarjeta SD 32GB clase 3.
  
- - Bus RS485
+ - 1 x Microinterruptor.
  
- - Conexion a Internet 
+  - 1 x Bus RS485.
  
- El  microcontrolador  usado es un  ESP32 Node MCU,  al que se ha conectado  un adaptador de trajetas  SD  usando las lineas MISO /MOSI, CS y SCK del controlador. Es por tanto en la tarjeta SD  donde almacenaemos las medidas usando un fichero  en formato CSV  para cada medidor. 
+  - 1 x Display I2C  de 2 lineas  y 16 caracteres (recomendable pero puede omitirse). 
  
- Adicionalmente  tenemos tambien 6 modulos PZEM 004   con sus respectivas bobinas de Rogowsky  que nos serviran para capturar las medidas de la intensidad  para  6 dispositivos electricos.
+  -OPCIONAL: Conexión a Internet para la captura fecha y hora inicial.  
+ 
+ El  microcontrolador  usado es un  ESP32 Node MCU,  al que se ha conectado  un adaptador de tarjetas  SD  usando las lineas MISO /MOSI, CS y SCK del controlador. Por tanto, e  en la tarjeta SD  donde almacenaremos de forma opcional las medidas de los diferentes modulos PZEM004 usando para ello un fichero individual en formato CSV  para cada medidor ( es decir, en nuestro experimento tendremos 6 ficheros de medida: 5 de los aplicativos y 1 correspondiente al consumo agregado). 
+ 
+ Adicionalmente  al controlador con su modulo de memoria tenemos  6 modulos PZEM 004 conectados al controlador mediante un bus RS485. Cada modulo cuenta  con su respectiva bobinas de Rogowsky  que nos servira para capturar las medidas de la intensidad  para  los 6 dispositivos electricos.
  
  La medida de la tension es tomada  mediante cableado paralelo que alimenta asimismo a los  6 módulos  de medida.  
  
- Las medidas de Tension, Corriente, Potencia, Frecuencia  y  Factor de Potencia  obtenidas por cada modulo, son enviadas mediante las lineas RX  y TX al controlador principal mediante  el uso  de un bus RS485
+ Las medidas de Tension, Corriente, Potencia, Frecuencia  y  Factor de Potencia  obtenidas por cada módulo, son enviadas mediante las lineas RX  y TX al controlador principal mediante  el uso  de un bus RS485.
  
- Todo el conjunto se alimenta con +5 v DC  directamente desde el propio bus  USB dado que el consumo de la parte rx/tz de cada módulo PZEM004 es muy pequeño pues solo se requiere para alimentar a los optoacopladores de la parte de transmision de cada modulo.
+ Todo el conjunto se alimenta con +5 v DC  directamente desde el propio bus  USB. dado que el consumo de la parte rx/tx de cada módulo PZEM004 es muy pequeño pues sólo se requiere para alimentar a los optoacopladores de la parte de transmision de cada modulo.
  
  
- El modulo de medidor multi-función PZEM-004T permite medir el voltaje RMS, corriente RMS, potencia activa y energia que toma una carga conectada a una linea monofasica de 110 / 220V como por ejemplo un estufa, Nevera, motor, electrodomestico, etc.... esta informacion puede ser enviada a un microcontrolador (por ejEmeplo Arduino o PIC), a un ordenador usando un adaptador USB a TTL, a un modulo WiFi  (como en este caso usando un ESP32 ) o a un PLC.
+ El modulo de medidor multi-función PZEM-004T permite medir el voltaje RMS, corriente RMS, potencia activa y energía que toma una carga conectada a una linea monofasica de 110 / 220V como por ejemplo un estufa, Nevera, motor, electrodomestico, etc.... Esta informacion puede ser enviada a un microcontrolador (por ejemplo podria ser un Arduino,PIC, un ordenador usando un adaptador USB a TTL,un PLC, o  a un modulo con WiFi, como en este caso es  un ESP32.
 
-Cuenta ademas con salidas optoacopladas, alarma de sobrecarga, almacenamiento de valores cuando se corta la luz, y boton de reset. Asimismo cuenta  con comunicación en serie (viene con interfaz serial TTL, a través de varios terminales de comunicarse con la placa adaptadora, leer, y establecer los parámetros). Mide Voltaje RMS, Corriente RMS, Potencia Activa y Energia
+Este módulo cuenta ademas con salidas optoacopladas, alarma de sobrecarga, almacenamiento de valores cuando se corta la luz, y boton de reset. Asimismo cuenta  con comunicación serie, viniendo equipado con un interfaz serial TTL,  de modo que a través de cuatro terminales se puede comunicar con la placa adaptadora, leer, y establecer los parámetros midiendo Voltaje RMS, Corriente RMS, Potencia Activa y Energia.
 
  Los rangos de medida:
 
@@ -63,17 +67,25 @@ Cuenta ademas con salidas optoacopladas, alarma de sobrecarga, almacenamiento de
  
  Los dispositivos contemplados  conectados a cada modulo PZEM004, cuyas  medidas  se introduciran en NILMTK para su analisis,  son los siguientes:
    
-   1 - Contador  de medición del consumo agregado
+   1 - Contador  de medición del consumo agregado..
    
-   2 - Ventilador
+   2- Soldador eléctrico.
    
-   3 - Ordenador portatil
+   3 - Lámpara LED.
    
-   4 - Lampara Halógena
+   4 - Lampara Halógena.
    
-   5 - Lámpara LED
+   5 - Ordenador portatil.
    
-   6 - Monitor de Ordenador de 17"
+   6 - Ventilador
+   
+  
+   
+ 
+   
+   
+   
+   
    
    
 ##   CARASTERICTICAS DEL  PZEM-004T-10A: Rango de medición 10A (derivación incorporada)
