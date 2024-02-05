@@ -4,6 +4,24 @@ Por Carlos Rodriguez Navarro
 
 Febrero de 2023
 
+**ABSTRACT:** *En el contexto de la creciente dependencia del sector energético mundial de los combustibles fósiles y la creciente preocupación por el medio ambiente, existe una necesidad urgente de avances en el monitoreo y la optimización de la energía. Para abordar este desafío, el presente estudio presenta el Open Multi Power Meter, una novedosa solución de hardware abierto diseñada para mediciones eléctricas eficientes y precisas. Este dispositivo está diseñado en torno a una arquitectura de microcontrolador único, con un conjunto completo de módulos de medición interconectados a través de un bus RS485, lo que garantiza una alta precisión y escalabilidad. Un aspecto importante de este desarrollo es la integración con el kit de herramientas de monitoreo de carga no intrusiva, que utiliza algoritmos avanzados para la desagregación de energía, incluida la optimización combinatoria y el modelo de Markov oculto finito. Se realizaron análisis comparativos utilizando conjuntos de datos públicos junto con monitores de hardware comercial y abierto para validar el diseño y las capacidades de este dispositivo. Estos estudios demuestran la notable efectividad del dispositivo, caracterizado por su simplicidad, flexibilidad y adaptabilidad en diversos escenarios de monitoreo de energía. La introducción de esta herramienta rentable y escalable marca una contribución al campo de la investigación energética, mejorando las prácticas de eficiencia energética. Esta investigación proporciona una solución práctica para la gestión de la energía y abre avances en el campo, destacando su impacto potencial tanto en la investigación académica como en las aplicaciones del mundo real.*
+
+**Introducción**
+
+A pesar de la gran cantidad de opciones disponibles de medidores inteligentes de consumo, existe una disparidad significativa en el rendimiento y la precisión de los monitores de energía en el mercado, ya que algunos ofrecen funciones esenciales y otros, como el oZm, brindan una alta precisión, pero necesitan más escalabilidad y capacidad de expansión.
+
+En este contexto, este documento presenta el Open Multi Power Meter (OMPM), una solución para abordar estas brechas, particularmente en el campo de la monitorización de carga no intrusiva (NILM), que ofrece un equilibrio entre precisión, escalabilidad y facilidad de uso. El OMPM es una solución de hardware abierto cuyo firmware también ha si-do desarrollado en código abierto [11]. La naturaleza de hardware abierto del dispositivo no solo lo hace accesible a una gama más amplia de usuarios, sino que también fomenta la innovación y la personalización, lo que permite adaptarlo a necesidades operativas o de investigación específicas.
+
+Un elemento central de la utilidad de OMPM es su compatibilidad con el kit de herramientas de monitoreo de carga no intrusiva (NILMTK) que emplea algoritmos avanzados para la desagregación de energía, un método que utiliza técnicas computacionales para estimar el uso de energía de los electrodomésticos individuales a partir de una sola lectura de medidor que registra la demanda total de energía. Los algoritmos de Optimización Combinatoria (CO) y Modelo de Markov Oculto Finito (FHMM) del NILMTK son particularmente hábiles para diseccionar patrones complejos de uso de energía, lo que los hace ideales para evaluar el rendimiento del OMPM. Al aprovechar estas herramientas, el OMPM puede proporcionar información detallada sobre el consumo de electricidad, lo que conduce a decisiones de gestión de la energía más informadas y a la optimización de la eficiencia, ya que, sin una retroalimentación directa, esperar que los consumidores participen activamente en un sistema energético sostenible y eficiente no es realista.
+
+El análisis comparativo del OMPM y otros conjuntos de datos públicos, incluidas las mediciones de monitores comerciales y de hardware abierto, subraya la precisión y esca-labilidad del dispositivo. Los resultados de estas comparaciones validan la eficacia del OMPM y destacan su simplicidad y adaptabilidad, lo que lo convierte en una herramienta valiosa para una amplia gama de aplicaciones, desde la investigación académica hasta las soluciones prácticas de gestión de la energía.
+
+La introducción del OMPM representa una contribución significativa a la medición inteligente y la eficiencia energética. Aborda las brechas críticas en las tecnologías actuales de monitoreo de energía y ofrece una solución escalable y rentable que puede adaptarse a las diversas necesidades de los sistemas energéticos modernos.
+
+**El proyecto OMPM**
+
+El OMPM es un desarrollo innovador en el campo de la tecnología de medición inteligente. Destaca por integrar una única arquitectura de microcontrolador con un conjunto de módulos de medida interconectados a través de un sistema de bus RS485, permitiendo la integración de múltiples módulos de medición de bajo coste según sea necesario. Este diseño garantiza un equilibrio entre la alta precisión en las mediciones eléctricas y la flexibilidad necesaria para la implementación a gran escala.
+
 El nuevo hardware usado para la adquisición y captura de las medidas eléctricas se basa en los siguientes componentes:
 
 -   ESP32 node MCU
@@ -17,11 +35,11 @@ El microcontrolador usado es un **ESP32 Node MCU**, al que se ha conectado un ad
 
 En la siguiente imagen podemos ver en detalle el conexionado del adaptador de SD al controlador ESP32.
 
-![](media/990ece985661ed149c9d376b7dbdd6ee.jpeg)
+![](media/95a984ea364d84b5722a0738826053ba.jpeg)
 
 Ilustración 1-Detalle de conexiones lector SD
 
-![Un cable conectado Descripción generada automáticamente con confianza baja](media/a89678ee39dbcdd656ca0a1febb760cf.jpeg)
+![Un cable conectado Descripción generada automáticamente con confianza baja](media/dde465bc04f80c26e51d6687c0b4138c.jpeg)
 
 Ilustración 2- Detalle conexionado lector sd al ESP32
 
@@ -51,17 +69,12 @@ En cuanto al firmware del ESP32, para usar cada módulo PZEM004 antes debemos pr
 
 Estas son las direcciones de los contadores establecedoras individualmente:
 
-uint8_t addr0=0x110; //1primer pzem es reconocido como 10 consumo agregado
-
-uint8_t addr1=0x120; //2primer pzem es reconocido como 20 enchufe 1
-
-uint8_t addr2=0x130; //2primer pzem es reconocido como 30 enchufe 2
-
-uint8_t addr3=0x140; //3primer pzem es reconocido como 40 enchufe 3
-
-uint8_t addr4=0x150; //4primer pzem es reconocido como 50 enchufe 4
-
-uint8_t addr5=0x160; //5primer pzem es reconocido como 60 enchufe 5
+-   uint8_t addr0=0x110; //1primer pzem es reconocido como 10 consumo agregado
+-   uint8_t addr1=0x120; //2primer pzem es reconocido como 20 enchufe 1
+-   uint8_t addr2=0x130; //2primer pzem es reconocido como 30 enchufe 2
+-   uint8_t addr3=0x140; //3primer pzem es reconocido como 40 enchufe 3
+-   uint8_t addr4=0x150; //4primer pzem es reconocido como 50 enchufe 4
+-   uint8_t addr5=0x160; //5primer pzem es reconocido como 60 enchufe 5
 
 En cuanto al software de adquisición al completo se adjunta en el anexo final. Resumidamente inicializamos la tarjeta SD, capturamos la fecha y hora actual mediante una conexión a la red y con ello creamos 6 ficheros para cada aplicativo (ver más abajo).
 
@@ -131,17 +144,15 @@ Todas las medidas se capturan a una frecuencia aproximada superior a 1HZ. Estas 
     -   \<10kWh, la unidad de visualización es Wh (1kWh = 1000Wh), como: 9999Wh
     -   ≥ 10kWh, la unidad de visualización es kWh, como: 9999.99kWh
 
-A continuación se presenta imagen del montaje final:
+A continuación, se presenta imagen del montaje final:
 
 ![Imagen que contiene interior, tabla, escritorio, computadora Descripción generada automáticamente](media/dd535301d1c5d9509a0e598247596cf1.jpg)
 
-# Segregación con NILMTK
+# **Desagregación con NILMTK**
 
-Todos los resultados se han almacenado en el repositorio de Github siguiente:
+Tanto el código como yodos los resultados se han almacenado en el repositorio de Github actual en forma de cuadernos de Jupyter Notebook (para su ejecución se requiere tener instalado además de Jupyter Notebook el toolkit NILTK disponible asimismo en Github). Respecto al conjunto de datos también está disponible en este mismo repositorio en formato HDFS5(el fichero se llama dsualm2.h5). Asimismo en este mismo repositorio esta disponible el firmware para usar con el ESP32.
 
-[crn565/Open-Multi-Power-Meter: Implementación de Nilmtk usando nuevo hardware basado en ESP32 un bus RS485 con 6 medidores PZEM004 (github.com)](https://github.com/crn565/Open-Multi-Power-Meter)
-
-Basándonos en conversor DSUAL, se ha creado un nuevo conversor llamado UALM2 para generar el nuevo dataset formado por 5 medidas dado que no disponemos del calculo de la potencia reactiva ni aparente
+Basándonos en conversor DSUAL, se ha creado un nuevo conversor llamado UALM2 para generar el nuevo dataset formado por 5 medidas dado que no disponemos del calculo de la potencia reactiva ni aparente.
 
 Este es el esquema del montaje obtenido en el paso 2:
 
@@ -236,5 +247,31 @@ Destaca nuevamente el valor tan nefasto para la métrica F1 respecto a la TV usa
 Por último, veamos los resultados obtenidos para las diferentes métricas y los diferentes aplicativos observando nuevamente como para el ventilador no tenemos valores.
 
 ![Gráfico, Gráfico en cascada Descripción generada automáticamente](media/001728098313718d10e034f3c6aa5c54.png)
+
+**Conclusiones**
+
+Este estudio presenta una novedosa solución basada en hardware caracterizada por la escalabilidad, la asequibilidad y la replicabilidad, al tiempo que mantiene la alta precisión típica de las soluciones de nivel profesional. El sistema emplea software de código abierto tanto en el firmware del microcontrolador como en la fase de procesamiento. Este software de procesamiento se basa en el kit de herramientas NILMTK y está adaptado para dar cabida a un nuevo conjunto de datos generado por este nuevo hardware.
+
+Un aspecto destacable de este trabajo es el desarrollo de un nuevo convertidor adaptado a los archivos de medición OMPM. Este convertidor crea un nuevo conjunto de datos que admite una marca de tiempo de 13 dígitos, lo que facilita la aplicación de las diversas fases de NILMTK, incluida la validación, el entrenamiento y la evaluación de métricas
+
+.
+
+Surgen diferencias significativas cuando se comparan los resultados obtenidos de la aplicación de métricas de NILMTK al conjunto de datos OMPM con los derivados del conjunto de datos DEPS (generado con hardware profesional). En particular, el conjunto de datos OMPM requiere tiempos de muestreo más cortos y exhibe una notable diferencia del 200% en la métrica RMSE en comparación con el conjunto de datos DEPS.
+
+Los prometedores resultados obtenidos con el conjunto de datos OMPM utilizando métricas NILMTK abren nuevas posibilidades para que los investigadores generen sus conjuntos de datos y mejoren aún más la investigación de NILM. La escalabilidad de la solución propuesta, facilitada por la implementación de un bus RS485, permite el uso de múltiples canales con un solo microcontrolador. Esta escalabilidad garantiza la captura de todas las mediciones eléctricas fundamentales con una precisión encomiable. Después de haber sido evaluado con éxito con seis módulos, el número de circuitos en un hogar tí-pico, el sistema tiene el potencial de expansión futura para acomodar aún más módulos
+
+.
+
+Para evaluar este nuevo hardware, se eligieron aplicaciones con bajo consumo de energía para aumentar la complejidad de las tareas de desagregación. El hardware arrojó resultados altamente satisfactorios en varias métricas, lo que sugiere su utilidad potencial en la investigación en curso de NILM. El trabajo futuro podría centrarse en mejorar la precisión de los módulos de medición. Actualmente, cada módulo se alimenta directamente de la tensión de red mediante un circuito RC simple, un diodo rectificador y un diodo Zener, con un regulador U3 (7133) en la salida. Se podría lograr una mejora alimentando el regulador a partir de una fuente aislada e independiente, como un R05P125, que ofrece una dirección prometedora para una mayor investigación y desarrollo.
+
+**Publicaciones**
+
+Toda esta documentación referida al OMPM esta publicada en la revista científica “Inventions:”
+
+-   C. Rodríguez-Navarro, F. Portillo, F. Martínez, F. Manzano-Agugliaro, and A. Alcayde, “Development and Application of an Open Power Meter Suitable for NILM,” *Inventions*, vol. 9, no. 1, p. 2, Dec. 2023, doi: 10.3390/inventions9010002.
+
+Hay un artículo de mi autoría sobre el NILM pero que usa el hardware OZM en lugar del OMPM:
+
+-   C. Rodriguez-Navarro, A. Alcayde, V. Isanbaev, L. Castro-Santos, A. Filgueira-Vizoso, and F. G. Montoya, “DSUALMH- A new high-resolution dataset for NILM,” *Renewable Energy and Power Quality Journal*, vol. 21, no. 1, pp. 238–243, Jul. 2023, doi: 10.24084/repqj21.286.
 
 
