@@ -1,272 +1,240 @@
-# Open-Multi-Power-Meter
-
-
-## Implementación de Nilmtk  usando  nuevo hardware basado en ESP32 sobre un bus RS485 con 6 medidores PZEM004 
-
-En este repositorio mostramos  la mayoria de posibilidades de NILMTK  usando en lugar de hardware comercial, como primicia un hardware  muy  facil de obtener.
-
-El hardware usado para la adquisicion y captura de las medidas eléctricas  se basa en  los siguientes componentes:
-
- - 1xx ESP32  node MCU.
- 
- - 6 x PZEM004.
- 
- - 1 x Lector  de tarjetas SD. 
- 
- - 1 x Tarjeta SD 32GB clase 3.
- 
- - 1 x Microinterruptor.
- 
-  - 1 x Bus RS485.
- 
-  - 1 x Display I2C  de 2 lineas  y 16 caracteres (recomendable pero puede omitirse). 
- 
-  -OPCIONAL: Conexión a Internet para la captura fecha y hora inicial.  
- 
- El  microcontrolador  usado es un  ESP32 Node MCU,  al que se ha conectado  un adaptador de tarjetas  SD  usando las lineas MISO /MOSI, CS y SCK del controlador. Por tanto, e  en la tarjeta SD  donde almacenaremos de forma opcional las medidas de los diferentes modulos PZEM004 usando para ello un fichero individual en formato CSV  para cada medidor ( es decir, en nuestro experimento tendremos 6 ficheros de medida: 5 de los aplicativos y 1 correspondiente al consumo agregado). 
- 
- Adicionalmente  al controlador con su modulo de memoria tenemos  6 modulos PZEM 004 conectados al controlador mediante un bus RS485. Cada modulo cuenta  con su respectiva bobinas de Rogowsky  que nos servira para capturar las medidas de la intensidad  para  los 6 dispositivos electricos.
- 
- La medida de la tension es tomada  mediante cableado paralelo que alimenta asimismo a los  6 módulos  de medida.  
- 
- Las medidas de Tension, Corriente, Potencia, Frecuencia  y  Factor de Potencia  obtenidas por cada módulo, son enviadas mediante las lineas RX  y TX al controlador principal mediante  el uso  de un bus RS485.
- 
- Todo el conjunto se alimenta con +5 v DC  directamente desde el propio bus  USB. dado que el consumo de la parte rx/tx de cada módulo PZEM004 es muy pequeño pues sólo se requiere para alimentar a los optoacopladores de la parte de transmision de cada modulo.
- 
- 
- El modulo de medidor multi-función PZEM-004T permite medir el voltaje RMS, corriente RMS, potencia activa y energía que toma una carga conectada a una linea monofasica de 110 / 220V como por ejemplo un estufa, Nevera, motor, electrodomestico, etc.... Esta informacion puede ser enviada a un microcontrolador (por ejemplo podria ser un Arduino,PIC, un ordenador usando un adaptador USB a TTL,un PLC, o  a un modulo con WiFi, como en este caso es  un ESP32.
-
-Este módulo cuenta ademas con salidas optoacopladas, alarma de sobrecarga, almacenamiento de valores cuando se corta la luz, y boton de reset. Asimismo cuenta  con comunicación serie, viniendo equipado con un interfaz serial TTL,  de modo que a través de cuatro terminales se puede comunicar con la placa adaptadora, leer, y establecer los parámetros midiendo Voltaje RMS, Corriente RMS, Potencia Activa y Energia.
-
- Los rangos de medida:
-
-   1. Potencia, rango: 0 a 22kW
-
-   -  De 0 a 10kW, el formato es 0.000 a 9.999
-
-   -  De 10 a 22kW, el formato es 10.00 a 22.00
+# Implementación de Nilmtk usando nuevo hardware basado en ESP32 sobre un bus RS485 con 6 medidores PZEM004
 
-2. Energía, rango: 0 a 9999kWh
+Por Carlos Rodriguez Navarro
 
-  -  De 0 a 10kWh, el formato es 0.000 a 9.999
+Febrero de 2023
 
-   - De 10 a 100kWh, el formato es 10.00 a 99.99
+El nuevo hardware usado para la adquisición y captura de las medidas eléctricas se basa en los siguientes componentes:
 
-   - De 100 a 1000kWh, el formato es 100.0 a 999.9
+-   ESP32 node MCU
+-   6 x PZEM004
+-   Lector de tarjetas SD
+-   Tarjeta SD
+-   Bus RS485
+-   Conexión a Internet
 
-   - De 1000 a 9999kWh, el formato es 1000 a 9999
+El microcontrolador usado es un **ESP32 Node MCU**, al que se ha conectado un adaptador de tarjetas SD usando las líneas MISO /MOSI, CS y SCK del controlador. Es por tanto en la tarjeta SD donde almacenamos las medidas usando un fichero en formato CSV para cada medidor.
 
-3. Voltaje, rango: 80 a 260VAC
+En la siguiente imagen podemos ver en detalle el conexionado del adaptador de SD al controlador ESP32.
 
-  - El formato es 110.0 ~ 220.0.
+![](media/990ece985661ed149c9d376b7dbdd6ee.jpeg)
 
-4. Corriente, rango : 0 a 100A
+Ilustración 1-Detalle de conexiones lector SD
 
- - El formato es 00.00 a 99.99
- 
- 
- Los dispositivos contemplados  conectados a cada modulo PZEM004, cuyas  medidas  se introduciran en NILMTK para su analisis,  son los siguientes:
-   
-   1 - Contador  de medición del consumo agregado..
-   
-   2- Soldador eléctrico.
-   
-   3 - Lámpara LED.
-   
-   4 - Lampara Halógena.
-   
-   5 - Ordenador portatil.
-   
-   6 - Ventilador
-   
-  
-   
- 
-   
-   
-   
-   
-   
-   
-##   CARASTERICTICAS DEL  PZEM-004T-10A: Rango de medición 10A (derivación incorporada)
+![Un cable conectado Descripción generada automáticamente con confianza baja](media/a89678ee39dbcdd656ca0a1febb760cf.jpeg)
 
+Ilustración 2- Detalle conexionado lector sd al ESP32
 
-PZEM-004T-100A: Rango de medición 100A (transformador externo)
+El módulo de medida PZEM004 mide las 5 características eléctricas fundamentales como son el voltaje RMS, corriente RMS, potencia Activa y la Energía contando con salidas opto-acopladas y comunicación en serie (viene con interfaz serial TTL, a través de varios terminales de comunicarse con la placa adaptadora, leer, y establecer los parámetros).
 
-1. Descripción de la función
+![Diagrama Descripción generada automáticamente](media/29c05c1b3c1e873fb0034f5742c08680.png)
 
-1.1 Voltage
+Ilustración 3-Esquema de bloques PZEM004
 
-1.1.1 Rango de medición: 80 ~ 260 V
-1.1.2 Resolución: 0.1 V
-1.1.3. Precisión de medición: 0.5%
+En el montaje tenemos **6 módulos PZEM 004** con sus respectivas bobinas de Rogowsky que nos servirán para capturar las medidas de la intensidad para 6 dispositivos eléctricos. Respecto a las medidas de la tensión es tomada mediante cableado paralelo, que alimenta asimismo a los 6 módulos de medida.
 
-1.2 actual
+Las medidas de tensión, Corriente, Potencia, Frecuencia y Factor de Potencia obtenidas por cada módulo son enviadas mediante las líneas RX y TX al controlador principal mediante el uso de un bus RS485.
 
-1.2.1 Rango de medición: 0 ~ 10A (PZEM-004T-10A); 0 ~ 100A (PZEM-004T-100A)
-1.2.2 Corriente de medida inicial: 0.01A (PZEM-004T-10A); 0. 024 (PZEM-004T-100A)
-1.2.3. Resolución: 0.001A
-1.2.4 Precisión de la medición: 0.5%
+Todo el conjunto se alimenta con +5 v DC directamente desde el propio bus USB dado que el consumo de la parte Rx/Tx de cada módulo PZEM004 es muy pequeño pues solo se requiere para alimentar a los optoacopladores de la parte de transmisión de cada módulo.
 
-1.3 Potencia activa
+El módulo de medidor multi-función PZEM-004T permite medir el voltaje RMS, corriente RMS, potencia activa y energía que toma una carga conectada a una línea monofásica de 110 / 220V como por ejemplo un estufa, Nevera, motor, electrodoméstico, etc.... esta información puede ser enviada a un microcontrolador (por ejemplo Arduino o PIC), a un ordenador usando un adaptador USB a TTL, a un módulo WiFi (como en este caso usando un ESP32 ) o a un PLC.
 
-1.3.1 Rango de medición: 0 ~ 2.3kW (PZEM-004T-10A); 0 ~ 23kW (PZEM-004T-100A)
-1.3.2 Potencia de medida inicial: 0.4 W
-1.3.3. Resolución: 0.1 W
-1.3.4 Formato de visualización:
-<1000 W, muestra un decimal, como: 999.9 W
-≥ 1000 W, muestra solo un número entero, como: 1000 W
-1.3.5 Precisión de la medición: 0.5%
+Este es el esquema del circuito final que se ha implementado (el display es opcional):
 
-1.4 Factor de potencia
+![Diagrama, Esquemático Descripción generada automáticamente](media/1de64d7c0fd30edd30c24c10199d1c45.png)
 
-1.4.1. Rango de medición: 0.00 ~ 1.00
-1.4.2 Resolución: 0.01
-1.4.3. Precisión de medición: 1%
+Ilustración 4- Esquema del circuito
 
-Frecuencia 1.5
+Como queda reflejado en el esquema superior, el Bus RS485 esta implementado mediante diodos Shockley rápidos en todas las líneas de transmisión de cada módulo PZEM004 y una resistencia común de 10K entre el positivo y dicha línea.
 
-1.5.1 Rango de medición: 45 Hz ~ 65 Hz
-1.5.2 Resolución: 0.1 Hz
-1.5.3. Precisión de medición: 0.5%
+En cuanto al firmware del ESP32, para usar cada módulo PZEM004 antes debemos programar una dirección única para cada modulo para que cada uno sea identificado biunívocamente.
 
-1.6 Energía activa
+Estas son las direcciones de los contadores establecedoras individualmente:
 
-1.6.1. Rango de medición: 0 ~ 9999.99kWh
-1.6.2 Resolución: 1 Wh
-1.6.3. Precisión de medición: 0.5%
-1.6.4 Formato de visualización:
-<10kWh, la unidad de visualización es Wh (1kWh = 1000Wh), como: 9999Wh
-≥ 10kWh, la unidad de visualización es kWh, como: 9999.99kWh
-1.6.5 Restablecer energía: use el software para restablecer.
+uint8_t addr0=0x110; //1primer pzem es reconocido como 10 consumo agregado
 
-1.7 Alarma de sobrecarga
+uint8_t addr1=0x120; //2primer pzem es reconocido como 20 enchufe 1
 
-El umbral de potencia activa se puede configurar, cuando la potencia activa medida supera el umbral, puede alarmar
+uint8_t addr2=0x130; //2primer pzem es reconocido como 30 enchufe 2
 
-1.8 Interfaz de comunicación
+uint8_t addr3=0x140; //3primer pzem es reconocido como 40 enchufe 3
 
-Interfaz RS485.
+uint8_t addr4=0x150; //4primer pzem es reconocido como 50 enchufe 4
 
-2 Protocolo de comunicación
+uint8_t addr5=0x160; //5primer pzem es reconocido como 60 enchufe 5
 
-2.1 Protocolo de capa física
+En cuanto al software de adquisición al completo se adjunta en el anexo final. Resumidamente inicializamos la tarjeta SD, capturamos la fecha y hora actual mediante una conexión a la red y con ello creamos 6 ficheros para cada aplicativo (ver más abajo).
 
-La capa física utiliza la interfaz de comunicación UART a RS485 .
-La velocidad en baudios es 9600, 8 bits de datos, 1 bit de parada, sin paridad
+Una vez creados los ficheros le añadimos las cabeceras en la primera línea, lo cual nos va a servir para identificar las 5 medidas junto con el timestamp de 13 dígitos.
 
-2.2 Protocolo de la capa de aplicación
+El cuerpo del programa principal va tomando de forma periódica todas las lecturas de cada contador, asegurándose antes de que cada contador esta accesible activo (de no estarlo pararía al siguiente). Lógicamente cada grupo de medidas es registrado en su correspondiente fichero junto el valor de la marca de tiempo correspondiente.
 
-La capa de aplicación utiliza el protocolo Modbus-RTU para comunicarse. En la actualidad, solo admite códigos de función como 0x03 (Leer registro de retención), 0x04 (Leer registro de entrada), 0x06 (Escribir registro único), 0x41 (Calibración), 0x42 (Restablecer energía) .etc.
+El programa supervisa continuamente el número total de medidas tomada para cada contador para asegurarse de que todos los contadores son accesibles y operativos.
 
-El código de función 0x41 es solo para uso interno (la dirección puede ser solo 0xF8), se usa para la calibración de fábrica y el regreso a las ocasiones de mantenimiento de fábrica, después del código de función para aumentar la contraseña de 16 bits, la contraseña predeterminada es 0x3721
+Los dispositivos contemplados conectados a cada módulo PZEM004, cuyas medidas se introducirán en NILMTK para su análisis, son los siguientes:
 
-El rango de direcciones del esclavo es 0x01 ~ 0xF7. La dirección 0x00 se utiliza como dirección de transmisión, el esclavo no necesita responder al maestro. La dirección 0xF8 se usa como dirección general, esta dirección solo se puede usar en un entorno de esclavo único y se puede usar para operaciones de calibración, etc.
+1 - Contador de medición del consumo agregado
 
-2.3. Leer el resultado de la medición
+2 - Ventilador
 
-El formato de comando del maestro lee el resultado de la medición es (total de 8 bytes):
+3 - Ordenador portátil
 
-Dirección esclava + 0x04 + Dirección de registro Byte alto + Dirección de registro Byte bajo + Número de registros Byte alto + Número de registros Byte bajo + Comprobación CRC Byte alto + Comprobación CRC Byte bajo.
+4 - Lámpara Halógena
 
-El formato de comando de la respuesta del esclavo se divide en dos tipos:
+5 - Lámpara LED
 
+6 - Monitor de Ordenador de 17"
 
-Respuesta correcta: Dirección esclava + 0x04 + Número de bytes + Registro 1 Byte alto de datos + Byte bajo de datos del registro 1 +… + Comprobación de CRC Byte alto + Comprobación de CRC Byte bajo
+Todas las medidas se capturan a una frecuencia aproximada superior a 1HZ. Estas son las especificaciones eléctricas de las medidas con el PZEM004:
 
-Respuesta de error: dirección esclava + 0x84 + código anormal + comprobación CRC byte alto + comprobación CRC byte bajo
+**Voltaje:**
 
-Código anormal analizado de la siguiente manera (lo mismo a continuación)
+-   Rango de medición: 80 \~ 260 V
+-   Resolución: 0.1 V
+-   Precisión de medición: 0.5%
 
-0x01, función ilegal
-0x02, dirección ilegal
-0x03, datos ilegales
-0x04, error de esclavo
-El registro de los resultados de la medición se organiza como la siguiente tabla
+**Corriente:**
 
-registro de los resultados de la medición
+-   Rango de medición: 0 \~ 10A (PZEM-004T-10A); 0 \~ 100A (PZEM-004T-100A)
+-   Corriente de medida inicial: 0.01A (PZEM-004T-10A); 0. 024 (PZEM-004T-100A)
+-   Resolución: 0.001A
+-   Precisión de la medición: 0.5%
 
-Por ej.ample, el maestro envía el siguiente comando (el código de verificación CRC se reemplaza por 0xHH y 0xLL, lo mismo a continuación)
+**Potencia activa:**
 
-0x01 + 0x04 + 0x00 + 0x00 + 0x00 + 0x0A + 0xHH + 0xLL
+-   Rango de medición: 0 \~ 2.3kW (PZEM-004T-10A); 0 \~ 23kW (PZEM-004T-100A)
+-   Potencia de medida inicial: 0.4 W
+-   Resolución: 0.1 W
+-   Formato de visualización:
+    -   \<1000 W, muestra un decimal, como: 999.9 W
+    -   ≥ 1000 W, muestra solo un número entero, como: 1000 W
+-   Precisión de la medición: 0.5%
 
-Indica que el maestro necesita leer 10 registros con la dirección de esclavo 0x01 y la dirección de inicio del registro es 0x0000
+**Factor de potencia**
 
-La respuesta correcta del esclavo es la siguiente:
+-   Rango de medición: 0.00 \~ 1.00
+-   Resolución: 0.01
+-   Precisión de medición: 1%
 
-0x01 + 0x04 + 0x14 + 0x08 + 0x98 + 0x03 + 0xE8 + 0x00 + 0x00 + 0x08 + 0x98 + 0x00 + 0x00 + 0x00 + 0x00 + 0x00 + 0x00 + 0x01 + 0xF4 + 0x00 + 0x64 + 0x00 + 0x00 + 0xHH + 0xLL
+**Frecuencia**
 
-Los datos anteriores muestran
+-   Rango de medición: 45 Hz \~ 65 Hz
+-   Resolución: 0.1 Hz
+-   Precisión de medición: 0.5%
 
-voltage es 0x0898, convertido a decimal es 2200, muestra 220.0V
-La corriente es 0x000003E8, convertida a decimal es 1000, muestra 1.000A
-La potencia es 0x00000898, convertida a decimal es 2200, muestra 220.0W
-La energía es 0x00000000, convertida a decimal es 0, muestra 0Wh
-La frecuencia es 0x01F4, convertida a decimal es 500, muestra 50.0Hz
-El factor de potencia es 0x0064, convertido a decimal es 100, muestra 1.00
-El estado de la alarma es 0x0000, indica que la potencia actual es menor que el umbral de potencia de la alarma
-2.4 Leer y modificar los parámetros del esclavo
+**Energía activa:**
 
-En la actualidad, solo admite la lectura y modificación de la dirección del esclavo y el umbral de alarma de potencia
+-   Rango de medición: 0 \~ 9999.99kWh
+-   Resolución: 1 Wh
+-   Precisión de medición: 0.5%
+-   Formato de visualización:
+    -   \<10kWh, la unidad de visualización es Wh (1kWh = 1000Wh), como: 9999Wh
+    -   ≥ 10kWh, la unidad de visualización es kWh, como: 9999.99kWh
 
-El registro está organizado como la siguiente tabla
+A continuación se presenta imagen del montaje final:
 
-El registro está organizado como la siguiente tabla
+![Imagen que contiene interior, tabla, escritorio, computadora Descripción generada automáticamente](media/dd535301d1c5d9509a0e598247596cf1.jpg)
 
+# Segregación con NILMTK
 
-El formato de comando del maestro para leer los parámetros del esclavo y leer los resultados de la medición es el mismo (descrito en detalles en la Sección 2.3), solo es necesario cambiar el código de función de 0x04 a 0x03
+Todos los resultados se han almacenado en el repositorio de Github siguiente:
 
-El formato de comando del maestro para modificar los parámetros del esclavo es (total de 8 bytes):
+[crn565/Open-Multi-Power-Meter: Implementación de Nilmtk usando nuevo hardware basado en ESP32 un bus RS485 con 6 medidores PZEM004 (github.com)](https://github.com/crn565/Open-Multi-Power-Meter)
 
-Dirección esclava + 0x06 + Dirección de registro Byte alto + Dirección de registro Byte bajo + Valor de registro Byte alto + Valor de registro Byte bajo + Comprobación de CRC Byte alto + Comprobación de CRC Byte bajo.
+Basándonos en conversor DSUAL, se ha creado un nuevo conversor llamado UALM2 para generar el nuevo dataset formado por 5 medidas dado que no disponemos del calculo de la potencia reactiva ni aparente
 
-El formato de comando de la respuesta del esclavo se divide en dos tipos:
+Este es el esquema del montaje obtenido en el paso 2:
 
-Respuesta correcta: dirección esclava + 0x06 + Número de bytes + Dirección de registro Byte bajo + Valor de registro Byte alto + Valor de registro Byte bajo + Comprobación de CRC Byte alto + Comprobación de CRC Byte bajo.
+![Un papalote volando en el cielo Descripción generada automáticamente con confianza media](media/4fac1900871270e673dd2b4433d696eb.png)
 
-Respuesta de error: Dirección de esclavo + 0x86 + Código anormal + Comprobación de CRC byte alto + Comprobación de CRC byte bajo.
+Esta es la fracción de consumo calculado para cada aparato:
 
-Por ej.ample, el maestro establece el umbral de alarma de potencia del esclavo:
+![Gráfico, Gráfico circular Descripción generada automáticamente](media/994c0cc11436aa28dba703577b8d57ed.png)
 
-0x01 + 0x06 + 0x00 + 0x01 + 0x08 + 0xFC + 0xHH + 0xLL
+Podemos representar gráficamente la tensión, frecuencia, potencia activa y la corriente para todos los aplicativos, como por ejemplo el agregado:
 
-Indica que el maestro necesita configurar el registro 0x0001 (umbral de alarma de potencia) en 0x08FC (2300W).
+![Gráfico, Gráfico de barras Descripción generada automáticamente](media/e92be0d595add001a0098124e5838fd8.png)
 
-Configurado correctamente, el esclavo vuelve a los datos que se envían desde el maestro.
+Es muy interesante ver como quedan registrados todas las medidas, donde se aprecia como en la primera hora se registran las 32 posibilidades en orden secuencial y en la segunda hora ya fue aleatorio:
 
-Por ej.ample, el maestro establece la dirección del esclavo
+![Gráfico, Histograma Descripción generada automáticamente](media/5b2a0c53c52473bb4364cbc0ccc27be2.png)
 
-0x01 + 0x06 + 0x00 + 0x02 + 0x00 + 0x05 + 0xHH + 0xLL
+Ilustración 5-Representación de la potencia de todos los contadores en la línea del tiempo
 
-Indica que el maestro necesita configurar el registro 0x0002 (dirección Modbus-RTU) en 0x0005
+Como primer paso obtenemos una primera estimación del funcionamiento de los dos algoritmos, lo cual en principio nos adelanta que el tiempo de muestreo a seleccionar será pequeño:
 
-Configurado correctamente, el esclavo vuelve a los datos que se envían desde el maestro.
+![Tabla Descripción generada automáticamente](media/98d6726bbbb3caa779a2d02e64719d29.png)
 
-2.5 Restablecer energía
+Ilustración 6- Datos preliminares de ejecución
 
-El formato de comando del maestro para restablecer el esclavo energía es (4 bytes en total):
+El resultado ya usando muchos más periodos de muestreo, los dos algoritmos CO y FHMM y los tres diferentes métodos de relleno nos da los siguientes resultados:
 
-Dirección de esclavo + 0x42 + comprobación CRC byte alto + comprobación CRC byte bajo.
+![Tabla Descripción generada automáticamente](media/685c4fa1d67c18be26675cbee8024419.png)
 
-Respuesta correcta: dirección de esclavo + 0x42 + control CRC byte alto + control CRC byte bajo.
+Ilustración 7 -Resultados ejecución tres métodos, dos algoritmos y tiempos
 
-Respuesta de error: dirección esclava + 0xC2 + código anormal + comprobación de CRC byte alto + comprobación de CRC byte bajo
+Como vemos, la combinación más eficiente es la del método combinatorio, método de relleno median y 30 segundos de muestreo.
 
-2.6 Calibración
+En la imagen podemos ver como los resultados son bastante buenos si comparamos la lectura real con la estimación que nos da el algoritmo.
 
-El formato de comando del maestro para calibrar el esclavo es (6 bytes en total):
+![Interfaz de usuario gráfica, Aplicación Descripción generada automáticamente](media/aa15521180568a9da8b61b135a16ed64.png)
 
-0xF8 + 0x41 + 0x37 + 0x21 + CRC comprobar byte alto + CRC comprobar byte bajo.
+Ilustración 8-Resultados método CO, 30 segundos, método median
 
-Respuesta correcta: 0xF8 + 0x41 + 0x37 + 0x21 + CRC comprobar byte alto + CRC comprobar byte bajo.
+La proporción de la energía desagregada es la siguiente usando CO, 30” y método median es la siguinte:
 
-Respuesta de error: 0xF8 + 0xC1 + Código anormal + Comprobación de CRC byte alto + Comprobación de CRC byte bajo.
+![Gráfico, Gráfico circular Descripción generada automáticamente](media/7f3b2e7bfb722da96a61d7a1f9c76550.png)
 
-Cabe señalar que la calibración toma de 3 a 4 segundos, después de que el maestro envía el comando, si la calibración es exitosa, tomará de 3 a 4 segundos recibir la respuesta del esclavo.
+Ilustración 9- Tanto por ciento de la energía desagregada
 
-2.7. Verificación CRC
+Ahora veremos la comparación entre la señal real y la estimada, lo cual no son datos muy buenos.
 
-La verificación CRC usa formato de 16 bits, ocupa dos bytes, el polinomio generador es X16 + X15 + X2 +1, el valor del polinomio usado para el cálculo es 0xA001.
+![Gráfico, Gráfico circular Descripción generada automáticamente](media/a3e60b52977dbf89f475902489eba36e.png)
 
-El valor de la verificación CRC es una trama de datos que divide todos los resultados de la verificación de todos los bytes excepto el valor de verificación CRC.
+Ilustración 10- Comparación Datos reales y Predicciones
+
+Finalmente, aplicando las métricas de NILMTK obtenemos los siguientes resultados para las medidas de F1, EAE, MNEAP y RMSE:
+
+![Tabla Descripción generada automáticamente](media/c21600607d4593a579e547605867d813.png)
+
+Ilustración 11-Resultados métricas
+
+Para la métrica F1 se obtienen valores muy buenos para el ventilador, ordenador portátil (que mejora incluso a la lampara halógena) o la lampara LED. El dato más perjudicado es la TV, aunque gráficamente no se entiende ese valor.
+
+![Interfaz de usuario gráfica, Gráfico, Aplicación, Gráfico de líneas Descripción generada automáticamente](media/d349c1948922f43aa96dc605411fa456.png)
+
+La métrica MNEAP también nos da valores muy buenos siendo el mejor sin duda para la lámpara halógena. El peor dato vuelve a ser para la TV.
+
+![Imagen que contiene Interfaz de usuario gráfica Descripción generada automáticamente](media/3a385dc52679ed386b45d91c39de9a6d.png)
+
+# 
+
+Sobre la métrica RMSE esta vez los datos son muy buenos para todos los aplicativos.
+
+![Interfaz de usuario gráfica Descripción generada automáticamente con confianza baja](media/eb97b8255da1a33a72fce82a04fd6024.png)
+
+# 
+
+Ahora veamos el promedio l para las 4 métricas y los diferentes periodos de muestreo:
+
+![Tabla Descripción generada automáticamente](media/b9dbd1f467a30c1f4ddda0c4cc273369.png)
+
+Ahora veamos los diferentes resultados máximos para las 4 métricas y los diferentes aplicativos:
+
+![Tabla Descripción generada automáticamente](media/f94c5322b359501847b3e8e26a5f4ca1.png)
+
+Esta es la correspondencia de índice:
+
+![Tabla Descripción generada automáticamente](media/f6ce4b00e3cf4f7b3b49c38448b6d337.png)
+
+Comparación de las diferentes métricas con los diferentes métodos de relleno;
+
+![Gráfico, Gráfico de barras Descripción generada automáticamente](media/2d3bb676a1d664c69412764d4d7f2522.png)
+
+Destaca nuevamente el valor tan nefasto para la métrica F1 respecto a la TV usando los tres diferentes métodos de relleno.
+
+Por último, veamos los resultados obtenidos para las diferentes métricas y los diferentes aplicativos observando nuevamente como para el ventilador no tenemos valores.
+
+![Gráfico, Gráfico en cascada Descripción generada automáticamente](media/001728098313718d10e034f3c6aa5c54.png)
+
 
