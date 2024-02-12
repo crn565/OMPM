@@ -1,8 +1,14 @@
 # Implementación de Nilmtk usando nuevo hardware basado en ESP32 sobre un bus RS485 con 6 medidores PZEM004
 
-Por Carlos Rodriguez Navarro
+Por Carlos Rodriguez Navarro  
 
 Febrero de 2023
+
+
+***Este extracto es referido a  un paper de mi autoria  referida al OMPM publicada en la revista científica “Inventions:”   C. Rodríguez-Navarro, F. Portillo, F. Martínez, F. Manzano-Agugliaro, and A. Alcayde, “Development and Application of an Open Power Meter Suitable for NILM,” *Inventions*, vol. 9, no. 1, p. 2, Dec. 2023, doi: 10.3390/inventions9010002.***
+
+
+
 
 **ABSTRACT:** *En el contexto de la creciente dependencia del sector energético mundial de los combustibles fósiles y la creciente preocupación por el medio ambiente, existe una necesidad urgente de avances en el monitoreo y la optimización de la energía. Para abordar este desafío, el presente estudio presenta el Open Multi Power Meter, una novedosa solución de hardware abierto diseñada para mediciones eléctricas eficientes y precisas. Este dispositivo está diseñado en torno a una arquitectura de microcontrolador único, con un conjunto completo de módulos de medición interconectados a través de un bus RS485, lo que garantiza una alta precisión y escalabilidad. Un aspecto importante de este desarrollo es la integración con el kit de herramientas de monitoreo de carga no intrusiva, que utiliza algoritmos avanzados para la desagregación de energía, incluida la optimización combinatoria y el modelo de Markov oculto finito. Se realizaron análisis comparativos utilizando conjuntos de datos públicos junto con monitores de hardware comercial y abierto para validar el diseño y las capacidades de este dispositivo. Estos estudios demuestran la notable efectividad del dispositivo, caracterizado por su simplicidad, flexibilidad y adaptabilidad en diversos escenarios de monitoreo de energía. La introducción de esta herramienta rentable y escalable marca una contribución al campo de la investigación energética, mejorando las prácticas de eficiencia energética. Esta investigación proporciona una solución práctica para la gestión de la energía y abre avances en el campo, destacando su impacto potencial tanto en la investigación académica como en las aplicaciones del mundo real.*
 
