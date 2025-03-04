@@ -1,282 +1,290 @@
-# Implementación de Nilmtk usando nuevo hardware basado en ESP32 sobre un bus RS485 con 6 medidores PZEM004
+# Implementation of Nilmtk using new ESP32 based hardware on a RS485 bus with 6 PZEM004 meters.
 
-Por Carlos Rodriguez Navarro  
+By Carlos Rodriguez Navarro
 
 Febrero de 2023
 
 
-***Este extracto es referido a  un paper de mi autoria  referida al OMPM publicada en la revista científica “Inventions:”   C. Rodríguez-Navarro, F. Portillo, F. Martínez, F. Manzano-Agugliaro, and A. Alcayde, “Development and Application of an Open Power Meter Suitable for NILM,” *Inventions*, vol. 9, no. 1, p. 2, Dec. 2023, doi: 10.3390/inventions9010002.***
+** **This excerpt refers to a paper by me on the OMPM published in the scientific journal "Inventions:" C. Rodríguez-Navarro, F. Portillo, F. Martínez, F. Manzano-Agugliaro, and A. Alcayde, "Development and Application of an Open Power Meter Suitable for NILM," *Inventions*, vol. 9, no. 1, p. 2, Dec. 2023, doi: doi: doi: 2023. Alcayde, "Development and Application of an Open Power Meter Suitable for NILM," *Inventions*, vol. 9, no. 1, p. 2, Dec. 2023, doi: 10.3390/inventions9010002.*** * *
 
 
 
+**ABSTRACT:** 
+*In the context of the global energy sector's increasing dependence on fossil fuels and growing environmental concerns, there is an urgent need for advances in energy monitoring and optimisation. To address this challenge, this study presents the Open Multi Power Meter, a novel open hardware solution designed for efficient and accurate electrical measurements. This device is designed around a unique microcontroller architecture, with a complete set of measurement modules interconnected through an RS485 bus, ensuring high accuracy and scalability. An important aspect of this development is the integration with the non-intrusive load monitoring toolkit, which uses advanced algorithms for energy disaggregation, including combinatorial optimisation and the finite hidden Markov model.
 
-**ABSTRACT:** *En el contexto de la creciente dependencia del sector energético mundial de los combustibles fósiles y la creciente preocupación por el medio ambiente, existe una necesidad urgente de avances en el monitoreo y la optimización de la energía. Para abordar este desafío, el presente estudio presenta el Open Multi Power Meter, una novedosa solución de hardware abierto diseñada para mediciones eléctricas eficientes y precisas. Este dispositivo está diseñado en torno a una arquitectura de microcontrolador único, con un conjunto completo de módulos de medición interconectados a través de un bus RS485, lo que garantiza una alta precisión y escalabilidad. Un aspecto importante de este desarrollo es la integración con el kit de herramientas de monitoreo de carga no intrusiva, que utiliza algoritmos avanzados para la desagregación de energía, incluida la optimización combinatoria y el modelo de Markov oculto finito. Se realizaron análisis comparativos utilizando conjuntos de datos públicos junto con monitores de hardware comercial y abierto para validar el diseño y las capacidades de este dispositivo. Estos estudios demuestran la notable efectividad del dispositivo, caracterizado por su simplicidad, flexibilidad y adaptabilidad en diversos escenarios de monitoreo de energía. La introducción de esta herramienta rentable y escalable marca una contribución al campo de la investigación energética, mejorando las prácticas de eficiencia energética. Esta investigación proporciona una solución práctica para la gestión de la energía y abre avances en el campo, destacando su impacto potencial tanto en la investigación académica como en las aplicaciones del mundo real.*
+Comparative analyses were performed using public datasets along with commercial and open hardware monitors to validate the design and capabilities of this device. These studies demonstrate the remarkable effectiveness of the device, characterised by its simplicity, flexibility and adaptability in various energy monitoring scenarios. The introduction of this cost-effective and scalable tool marks a contribution to the field of energy research, improving energy efficiency practices. This research provides a practical solution for energy management and opens breakthroughs in the field, highlighting its potential impact on both academic research and real-world applications.
 
-**Introducción**
+**Introduction**
 
-A pesar de la gran cantidad de opciones disponibles de medidores inteligentes de consumo, existe una disparidad significativa en el rendimiento y la precisión de los monitores de energía en el mercado, ya que algunos ofrecen funciones esenciales y otros, como el oZm, brindan una alta precisión, pero necesitan más escalabilidad y capacidad de expansión.
+Despite the large number of smart energy meter options available, there is a significant disparity in the performance and accuracy of energy monitors on the market, with some offering essential functions and others, such as the oZm, providing high accuracy but needing more scalability and expandability.
+In this context, this paper presents the Open Multi Power Meter (OMPM), a solution to address these gaps, particularly in the field of non-intrusive load monitoring (NILM), which offers a balance between accuracy, scalability and ease of use. The OMPM is an open hardware solution whose firmware has also been developed in open source [11]. The open hardware nature of the device not only makes it accessible to a wider range of users, but also encourages innovation and customisation, allowing it to be adapted to specific operational or research needs.
+Central to OMPM's utility is its compatibility with the Non-Intrusive Load Monitoring Toolkit (NILMTK) which employs advanced algorithms for energy disaggregation, a method that uses computational techniques to estimate the energy use of individual appliances from a single meter reading that records total energy demand. NILMTK's Combinatorial Optimisation (CO) and Finite Hidden Markov Model (FHMM) algorithms are particularly adept at dissecting complex energy usage patterns, making them ideal for evaluating OMPM performance. By leveraging these tools, the OMPM can provide detailed information on electricity consumption, leading to more informed energy management decisions and efficiency optimisation, as, without direct feedback, expecting consumers to actively participate in a sustainable and efficient energy system is unrealistic.
+Comparative analysis of the OMPM and other public datasets, including measurements from commercial and open hardware monitors, underscores the accuracy and affordability of the device. The results of these comparisons validate the effectiveness of the OMPM and highlight its simplicity and adaptability, making it a valuable tool for a wide range of applications, from academic research to practical energy management solutions.
+The introduction of the OMPM represents a significant contribution to smart metering and energy efficiency. It addresses critical gaps in current energy monitoring technologies and offers a scalable and cost-effective solution that can be adapted to the diverse needs of modern energy systems.
+ 
+ ** The OMPM project**
 
-En este contexto, este documento presenta el Open Multi Power Meter (OMPM), una solución para abordar estas brechas, particularmente en el campo de la monitorización de carga no intrusiva (NILM), que ofrece un equilibrio entre precisión, escalabilidad y facilidad de uso. El OMPM es una solución de hardware abierto cuyo firmware también ha si-do desarrollado en código abierto [11]. La naturaleza de hardware abierto del dispositivo no solo lo hace accesible a una gama más amplia de usuarios, sino que también fomenta la innovación y la personalización, lo que permite adaptarlo a necesidades operativas o de investigación específicas.
+The OMPM is an innovative development in the field of smart metering technology. It stands out by integrating a single microcontroller architecture with a set of measurement modules interconnected through an RS485 bus system, allowing the integration of multiple low-cost measurement modules as required. This design ensures a balance between high accuracy in electrical measurements and the flexibility required for large-scale implementation.
 
-Un elemento central de la utilidad de OMPM es su compatibilidad con el kit de herramientas de monitoreo de carga no intrusiva (NILMTK) que emplea algoritmos avanzados para la desagregación de energía, un método que utiliza técnicas computacionales para estimar el uso de energía de los electrodomésticos individuales a partir de una sola lectura de medidor que registra la demanda total de energía. Los algoritmos de Optimización Combinatoria (CO) y Modelo de Markov Oculto Finito (FHMM) del NILMTK son particularmente hábiles para diseccionar patrones complejos de uso de energía, lo que los hace ideales para evaluar el rendimiento del OMPM. Al aprovechar estas herramientas, el OMPM puede proporcionar información detallada sobre el consumo de electricidad, lo que conduce a decisiones de gestión de la energía más informadas y a la optimización de la eficiencia, ya que, sin una retroalimentación directa, esperar que los consumidores participen activamente en un sistema energético sostenible y eficiente no es realista.
 
-El análisis comparativo del OMPM y otros conjuntos de datos públicos, incluidas las mediciones de monitores comerciales y de hardware abierto, subraya la precisión y esca-labilidad del dispositivo. Los resultados de estas comparaciones validan la eficacia del OMPM y destacan su simplicidad y adaptabilidad, lo que lo convierte en una herramienta valiosa para una amplia gama de aplicaciones, desde la investigación académica hasta las soluciones prácticas de gestión de la energía.
+The new hardware used for the acquisition and capture of electrical measurements is based on the following components:
 
-La introducción del OMPM representa una contribución significativa a la medición inteligente y la eficiencia energética. Aborda las brechas críticas en las tecnologías actuales de monitoreo de energía y ofrece una solución escalable y rentable que puede adaptarse a las diversas necesidades de los sistemas energéticos modernos.
+- ESP32 node MCU
+- 6 x PZEM004
+- SD card reader
+- SD card
+- RS485 bus
+- Internet connection
 
-**El proyecto OMPM**
+The microcontroller used is an **ESP32 Node MCU** , to which an SD card adapter has been connected using the MISO /MOSI, CS and SCK lines of the controller. It is therefore on the SD card where we store the measurements using a CSV format file for each meter.
 
-El OMPM es un desarrollo innovador en el campo de la tecnología de medición inteligente. Destaca por integrar una única arquitectura de microcontrolador con un conjunto de módulos de medida interconectados a través de un sistema de bus RS485, permitiendo la integración de múltiples módulos de medición de bajo coste según sea necesario. Este diseño garantiza un equilibrio entre la alta precisión en las mediciones eléctricas y la flexibilidad necesaria para la implementación a gran escala.
 
-El nuevo hardware usado para la adquisición y captura de las medidas eléctricas se basa en los siguientes componentes:
-
--   ESP32 node MCU
--   6 x PZEM004
--   Lector de tarjetas SD
--   Tarjeta SD
--   Bus RS485
--   Conexión a Internet
-
-El microcontrolador usado es un **ESP32 Node MCU**, al que se ha conectado un adaptador de tarjetas SD usando las líneas MISO /MOSI, CS y SCK del controlador. Es por tanto en la tarjeta SD donde almacenamos las medidas usando un fichero en formato CSV para cada medidor.
-
-En la siguiente imagen podemos ver en detalle el conexionado del adaptador de SD al controlador ESP32.
+In the following image we can see in detail the connection of the SD adapter to the ESP32 controller.
 
 ![](media/95a984ea364d84b5722a0738826053ba.jpeg)
 
-Ilustración 1-Detalle de conexiones lector SD
+Illustration 1-Detail of SD Reader connections
 
 ![Un cable conectado Descripción generada automáticamente con confianza baja](media/dde465bc04f80c26e51d6687c0b4138c.jpeg)
 
-Ilustración 2- Detalle conexionado lector sd al ESP32
+Illustration 2- Detail of sd reader connection to the ESP32
 
-El módulo de medida PZEM004 mide las 5 características eléctricas fundamentales como son el voltaje RMS, corriente RMS, potencia Activa y la Energía contando con salidas opto-acopladas y comunicación en serie (viene con interfaz serial TTL, a través de varios terminales de comunicarse con la placa adaptadora, leer, y establecer los parámetros).
+The measurement module PZEM004 measures the 5 fundamental electrical characteristics such as RMS voltage, RMS current, Active power and Energy with opto-coupled outputs and serial communication (comes with TTL serial interface, through various terminals to communicate with the adapter board, read, and set the parameters)..
 
 ![Diagrama Descripción generada automáticamente](media/29c05c1b3c1e873fb0034f5742c08680.png)
 
-Ilustración 3-Esquema de bloques PZEM004
+Illustration 3-Block diagram PZEM004
 
-En el montaje tenemos **6 módulos PZEM 004** con sus respectivas bobinas de Rogowsky que nos servirán para capturar las medidas de la intensidad para 6 dispositivos eléctricos. Respecto a las medidas de la tensión es tomada mediante cableado paralelo, que alimenta asimismo a los 6 módulos de medida.
 
-Las medidas de tensión, Corriente, Potencia, Frecuencia y Factor de Potencia obtenidas por cada módulo son enviadas mediante las líneas RX y TX al controlador principal mediante el uso de un bus RS485.
+In the assembly we have **6 PZEM 004 modules** with their respective Rogowsky coils that will be used to capture the current measurements for 6 electrical devices. The voltage measurements are taken by means of parallel wiring, which also feeds the 6 measurement modules.
 
-Todo el conjunto se alimenta con +5 v DC directamente desde el propio bus USB dado que el consumo de la parte Rx/Tx de cada módulo PZEM004 es muy pequeño pues solo se requiere para alimentar a los optoacopladores de la parte de transmisión de cada módulo.
+The voltage, current, power, frequency and power factor measurements obtained by each module are sent via the RX and TX lines to the main controller using an RS485 bus.
 
-El módulo de medidor multi-función PZEM-004T permite medir el voltaje RMS, corriente RMS, potencia activa y energía que toma una carga conectada a una línea monofásica de 110 / 220V como por ejemplo un estufa, Nevera, motor, electrodoméstico, etc.... esta información puede ser enviada a un microcontrolador (por ejemplo Arduino o PIC), a un ordenador usando un adaptador USB a TTL, a un módulo WiFi (como en este caso usando un ESP32 ) o a un PLC.
+The whole assembly is powered with +5 v DC directly from the USB bus itself as the power consumption of the Rx/Tx part of each PZEM004 module is very small as it is only required to power the optocouplers of the transmission part of each module.
 
-Este es el esquema del circuito final que se ha implementado (el display es opcional):
+
+The multi-function meter module PZEM-004T allows to measure the RMS voltage, RMS current, active power and energy consumption of a load connected to a single phase 110 / 220V line such as a cooker, refrigerator, motor, appliance, etc. .... this information can be sent to a microcontroller (for example Arduino or PIC), to a computer using a USB to TTL adapter, to a WiFi module (as in this case using an ESP32) or to a PLC.
+
+
+This is the schematic of the final circuit that has been implemented (the display is optional):
 
 ![Diagrama, Esquemático Descripción generada automáticamente](media/1de64d7c0fd30edd30c24c10199d1c45.png)
 
-Ilustración 4- Esquema del circuito
+Illustration 4- Circuit diagram
 
-Como queda reflejado en el esquema superior, el Bus RS485 esta implementado mediante diodos Shockley rápidos en todas las líneas de transmisión de cada módulo PZEM004 y una resistencia común de 10K entre el positivo y dicha línea.
 
-En cuanto al firmware del ESP32, para usar cada módulo PZEM004 antes debemos programar una dirección única para cada modulo para que cada uno sea identificado biunívocamente.
+As shown in the diagram above, the RS485 bus is implemented by means of fast Shockley diodes on all the transmission lines of each PZEM004 module and a common 10K resistor between the positive and that line.
 
-Estas son las direcciones de los contadores establecedoras individualmente:
 
--   uint8_t addr0=0x110; //1primer pzem es reconocido como 10 consumo agregado
--   uint8_t addr1=0x120; //2primer pzem es reconocido como 20 enchufe 1
--   uint8_t addr2=0x130; //2primer pzem es reconocido como 30 enchufe 2
--   uint8_t addr3=0x140; //3primer pzem es reconocido como 40 enchufe 3
--   uint8_t addr4=0x150; //4primer pzem es reconocido como 50 enchufe 4
--   uint8_t addr5=0x160; //5primer pzem es reconocido como 60 enchufe 5
+As for the ESP32 firmware, to use each PZEM004 module we must first program a unique address for each module so that each one is identified biunivocally.
 
-En cuanto al software de adquisición al completo se adjunta en el anexo final. Resumidamente inicializamos la tarjeta SD, capturamos la fecha y hora actual mediante una conexión a la red y con ello creamos 6 ficheros para cada aplicativo (ver más abajo).
+These are the addresses of the individual counters:
 
-Una vez creados los ficheros le añadimos las cabeceras en la primera línea, lo cual nos va a servir para identificar las 5 medidas junto con el timestamp de 13 dígitos.
+- uint8_t addr0=0x110; //1first pzem is recognised as 10 aggregate consumption
+- uint8_t addr1=0x120; //2first pzem is recognised as 20 socket 1
+- uint8_t addr2=0x130; //2first pzem is recognised as 30 socket 2
+- uint8_t addr3=0x140; //3first pzem is recognised as 40 socket 3
+- uint8_t addr4=0x150; //4first pzem is recognised as 50 socket 4
+- uint8_t addr5=0x160; //5first pzem is recognised as 60 socket 5
 
-El cuerpo del programa principal va tomando de forma periódica todas las lecturas de cada contador, asegurándose antes de que cada contador esta accesible activo (de no estarlo pararía al siguiente). Lógicamente cada grupo de medidas es registrado en su correspondiente fichero junto el valor de la marca de tiempo correspondiente.
+The complete acquisition software is attached in the final appendix. In summary, we initialise the SD card, capture the current date and time via a network connection and create 6 files for each application (see below).
 
-El programa supervisa continuamente el número total de medidas tomada para cada contador para asegurarse de que todos los contadores son accesibles y operativos.
+
+Once the files are created, we add the headers in the first line, which will be used to identify the 5 measurements together with the 13-digit timestamp.
+
+
+The body of the main program periodically takes all the readings of each meter, making sure beforehand that each meter is accessible and active (if it is not, it will stop the next one). Logically, each group of measurements is recorded in its corresponding file together with the value of the corresponding timestamp.
+
+
+The program continuously monitors the total number of measurements taken for each meter to ensure that all meters are accessible and operational.
 
 Los dispositivos contemplados conectados a cada módulo PZEM004, cuyas medidas se introducirán en NILMTK para su análisis, son los siguientes:
 
-1 - Contador de medición del consumo agregado
+1 - Aggregate consumption meter
 
-2 - Ventilador
 
-3 - Ordenador portátil
+2 - Fan
 
-4 - Lámpara Halógena
 
-5 - Lámpara LED
+3 - Laptop computer
 
-6 - Monitor de Ordenador de 17"
 
-Todas las medidas se capturan a una frecuencia aproximada superior a 1HZ. Estas son las especificaciones eléctricas de las medidas con el PZEM004:
+4 - Halogen lamp
 
-**Voltaje:**
 
--   Rango de medición: 80 \~ 260 V
--   Resolución: 0.1 V
--   Precisión de medición: 0.5%
+5 - LED Lamp
 
-**Corriente:**
 
--   Rango de medición: 0 \~ 10A (PZEM-004T-10A); 0 \~ 100A (PZEM-004T-100A)
--   Corriente de medida inicial: 0.01A (PZEM-004T-10A); 0. 024 (PZEM-004T-100A)
--   Resolución: 0.001A
--   Precisión de la medición: 0.5%
+6 - 17" Computer Monitor
 
-**Potencia activa:**
+All measurements are captured at a frequency greater than approximately 1HZ. These are the electrical specifications of the measurements with the PZEM004:
 
--   Rango de medición: 0 \~ 2.3kW (PZEM-004T-10A); 0 \~ 23kW (PZEM-004T-100A)
--   Potencia de medida inicial: 0.4 W
--   Resolución: 0.1 W
--   Formato de visualización:
-    -   \<1000 W, muestra un decimal, como: 999.9 W
-    -   ≥ 1000 W, muestra solo un número entero, como: 1000 W
--   Precisión de la medición: 0.5%
+**Voltage:**
+- Measuring range: 80 \~ 260 V
+- Resolution: 0.1 V
+- Measuring accuracy: 0.5%.
 
-**Factor de potencia**
+**Current:**
+- Measuring range: 0 \~ 10A (PZEM-004T-10A); 0 \~ 100A (PZEM-004T-100A)
+- Initial measuring current: 0.01A (PZEM-004T-10A); 0. 024 (PZEM-004T-100A)
+- Resolution: 0.001A
+- Measuring accuracy: 0.5%.
 
--   Rango de medición: 0.00 \~ 1.00
--   Resolución: 0.01
--   Precisión de medición: 1%
+**Active power:** 
+- Measuring range: 0 \~ 2.3kW (PZEM-004T-10A);
+- Initial measurement power: 0.4 W
+- Resolution: 0.1 W
+- Display format:
+- \<1000 W, displays one decimal place, such as: 999.9 W
+- ≥ 1000 W, displays only a whole number, such as: 1000 W
+- Measurement accuracy: 0.5%.
 
-**Frecuencia**
+ **Power factor** 
+- Measuring range: 0.00 \~ 1.00
+- Resolution: 0.01
+- Measuring accuracy: 1%
 
--   Rango de medición: 45 Hz \~ 65 Hz
--   Resolución: 0.1 Hz
--   Precisión de medición: 0.5%
+**Frecuency**
+- Measuring range: 45 Hz \~ 65 Hz
+- Resolution: 0.1 Hz
+- Measuring accuracy: 0.5%.
 
-**Energía activa:**
+**Active energy:** 
+- Measuring range: 0 \~ 9999.99kWh
+- Resolution: 1 Wh
+- Measuring accuracy: 0.5%.
+- Display format:
+- \<10kWh, display unit is Wh (1kWh = 1000Wh), such as: 9999Wh.
+- ≥ 10kWh, the display unit is kWh, as: 9999.99kWh
 
--   Rango de medición: 0 \~ 9999.99kWh
--   Resolución: 1 Wh
--   Precisión de medición: 0.5%
--   Formato de visualización:
-    -   \<10kWh, la unidad de visualización es Wh (1kWh = 1000Wh), como: 9999Wh
-    -   ≥ 10kWh, la unidad de visualización es kWh, como: 9999.99kWh
-
-A continuación, se presenta imagen del montaje final:
+Below is an image of the final assembly:
 
 ![Imagen que contiene interior, tabla, escritorio, computadora Descripción generada automáticamente](media/dd535301d1c5d9509a0e598247596cf1.jpg)
 
-# **Desagregación con NILMTK**
 
-Tanto el código como yodos los resultados se han almacenado en el repositorio de Github actual en forma de cuadernos de Jupyter Notebook (para su ejecución se requiere tener instalado además de Jupyter Notebook el toolkit NILTK disponible asimismo en Github). Respecto al conjunto de datos también está disponible en este mismo repositorio en formato HDFS5(el fichero se llama dsualm2.h5). Asimismo en este mismo repositorio esta disponible el firmware para usar con el ESP32.
+ **Disaggregation with NILMTK**
 
-Basándonos en conversor DSUAL, se ha creado un nuevo conversor llamado UALM2 para generar el nuevo dataset formado por 5 medidas dado que no disponemos del calculo de la potencia reactiva ni aparente.
+ 
+Both the code and all the results have been stored in the current Github repository in the form of Jupyter Notebook notebooks (for its execution it is required to have installed in addition to Jupyter Notebook the NILTK toolkit also available in Github). The dataset is also available in this same repository in HDFS5 format (the file is called dsualm2.h5). Also in this same repository is available the firmware for use with the ESP32.
 
-Este es el esquema del montaje obtenido en el paso 2:
+
+Based on the DSUAL converter, a new converter called UALM2 has been created to generate the new dataset made up of 5 measurements, given that we do not have the reactive or apparent power calculation.
+
+
+This is the scheme of the assembly obtained in step 2:
 
 ![Un papalote volando en el cielo Descripción generada automáticamente con confianza media](media/4fac1900871270e673dd2b4433d696eb.png)
 
-Esta es la fracción de consumo calculado para cada aparato:
+
+This is the fraction of consumption calculated for each appliance:
 
 ![Gráfico, Gráfico circular Descripción generada automáticamente](media/994c0cc11436aa28dba703577b8d57ed.png)
 
-Podemos representar gráficamente la tensión, frecuencia, potencia activa y la corriente para todos los aplicativos, como por ejemplo el agregado:
-
+We can graphically display voltage, frequency, active power and current for all applications, e.g. aggregate:
 ![Gráfico, Gráfico de barras Descripción generada automáticamente](media/e92be0d595add001a0098124e5838fd8.png)
 
-Es muy interesante ver como quedan registrados todas las medidas, donde se aprecia como en la primera hora se registran las 32 posibilidades en orden secuencial y en la segunda hora ya fue aleatorio:
-
+It is very interesting to see how all the measurements are recorded, where it can be seen how in the first hour the 32 possibilities are recorded in sequential order and in the second hour it was randomised:
 ![Gráfico, Histograma Descripción generada automáticamente](media/5b2a0c53c52473bb4364cbc0ccc27be2.png)
 
-Ilustración 5-Representación de la potencia de todos los contadores en la línea del tiempo
+Illustration 5-Representation of the power of all counters on the timeline
 
-Como primer paso obtenemos una primera estimación del funcionamiento de los dos algoritmos, lo cual en principio nos adelanta que el tiempo de muestreo a seleccionar será pequeño:
 
+As a first step we obtain a first estimation of the performance of the two algorithms, which in principle gives us an indication that the sampling time to be selected will be small:
 ![Tabla Descripción generada automáticamente](media/98d6726bbbb3caa779a2d02e64719d29.png)
 
-Ilustración 6- Datos preliminares de ejecución
+Illustration 6- Preliminary execution data
 
-El resultado ya usando muchos más periodos de muestreo, los dos algoritmos CO y FHMM y los tres diferentes métodos de relleno nos da los siguientes resultados:
 
+The result already using many more sampling periods, the two algorithms CO and FHMM and the three different filling methods gives the following results:
 ![Tabla Descripción generada automáticamente](media/685c4fa1d67c18be26675cbee8024419.png)
 
-Ilustración 7 -Resultados ejecución tres métodos, dos algoritmos y tiempos
+Figure 7 - Results running three methods, two algorithms and times
 
-Como vemos, la combinación más eficiente es la del método combinatorio, método de relleno median y 30 segundos de muestreo.
 
-En la imagen podemos ver como los resultados son bastante buenos si comparamos la lectura real con la estimación que nos da el algoritmo.
+As we can see, the most efficient combination is that of the combinatorial method, median fill method and 30 seconds of sampling.
+
+
+In the image we can see how the results are quite good if we compare the real reading with the estimation given by the algorithm.
 
 ![Interfaz de usuario gráfica, Aplicación Descripción generada automáticamente](media/aa15521180568a9da8b61b135a16ed64.png)
 
-Ilustración 8-Resultados método CO, 30 segundos, método median
+Illustration 8-Results CO method, 30 seconds, median method
 
-La proporción de la energía desagregada es la siguiente usando CO, 30” y método median es la siguinte:
 
+The ratio of the disaggregated energy is as follows using CO, 30" and median method:
 ![Gráfico, Gráfico circular Descripción generada automáticamente](media/7f3b2e7bfb722da96a61d7a1f9c76550.png)
 
-Ilustración 9- Tanto por ciento de la energía desagregada
+Figure 9 - Percentage of unbundled energy
 
-Ahora veremos la comparación entre la señal real y la estimada, lo cual no son datos muy buenos.
 
+Now we will see the comparison between the actual and the estimated signal, which is not very good data.
 ![Gráfico, Gráfico circular Descripción generada automáticamente](media/a3e60b52977dbf89f475902489eba36e.png)
 
-Ilustración 10- Comparación Datos reales y Predicciones
+Illustration 10- Comparison of Actual Data and Predictions
 
-Finalmente, aplicando las métricas de NILMTK obtenemos los siguientes resultados para las medidas de F1, EAE, MNEAP y RMSE:
 
+Finally, applying the NILMTK metrics we obtain the following results for the F1, EAE, MNEAP and RMSE measures:
 ![Tabla Descripción generada automáticamente](media/c21600607d4593a579e547605867d813.png)
 
-Ilustración 11-Resultados métricas
+Illustration 11-Metric results
 
-Para la métrica F1 se obtienen valores muy buenos para el ventilador, ordenador portátil (que mejora incluso a la lampara halógena) o la lampara LED. El dato más perjudicado es la TV, aunque gráficamente no se entiende ese valor.
+
+For metric F1, very good values are obtained for the fan, laptop (which is even better than the halogen lamp) or the LED lamp. The worst performer is the TV, although this value is not graphically understandable.
 
 ![Interfaz de usuario gráfica, Gráfico, Aplicación, Gráfico de líneas Descripción generada automáticamente](media/d349c1948922f43aa96dc605411fa456.png)
 
-La métrica MNEAP también nos da valores muy buenos siendo el mejor sin duda para la lámpara halógena. El peor dato vuelve a ser para la TV.
-
+The MNEAP metric also gives very good values, the best being undoubtedly for the halogen lamp. The worst figure is again for the TV.
 ![Imagen que contiene Interfaz de usuario gráfica Descripción generada automáticamente](media/3a385dc52679ed386b45d91c39de9a6d.png)
 
-# 
+ 
 
-Sobre la métrica RMSE esta vez los datos son muy buenos para todos los aplicativos.
-
+On the RMSE metric this time the data is very good for all applications.
 ![Interfaz de usuario gráfica Descripción generada automáticamente con confianza baja](media/eb97b8255da1a33a72fce82a04fd6024.png)
 
-# 
-
-Ahora veamos el promedio l para las 4 métricas y los diferentes periodos de muestreo:
-
+Let us now look at the average l for the 4 metrics and the different sampling periods:
 ![Tabla Descripción generada automáticamente](media/b9dbd1f467a30c1f4ddda0c4cc273369.png)
 
-Ahora veamos los diferentes resultados máximos para las 4 métricas y los diferentes aplicativos:
-
+Let us now look at the different maximum results for the 4 metrics and the different applications:
 ![Tabla Descripción generada automáticamente](media/f94c5322b359501847b3e8e26a5f4ca1.png)
 
-Esta es la correspondencia de índice:
+This is the index correspondence:
 
 ![Tabla Descripción generada automáticamente](media/f6ce4b00e3cf4f7b3b49c38448b6d337.png)
 
-Comparación de las diferentes métricas con los diferentes métodos de relleno;
+Comparison of different metrics with different filling methods;
 
 ![Gráfico, Gráfico de barras Descripción generada automáticamente](media/2d3bb676a1d664c69412764d4d7f2522.png)
 
-Destaca nuevamente el valor tan nefasto para la métrica F1 respecto a la TV usando los tres diferentes métodos de relleno.
+The very poor value for the F1 metric with respect to the TV using the three different filling methods is again noteworthy.
 
-Por último, veamos los resultados obtenidos para las diferentes métricas y los diferentes aplicativos observando nuevamente como para el ventilador no tenemos valores.
 
+Finally, let's look at the results obtained for the different metrics and the different applications, observing again how for the fan we have no values.
 ![Gráfico, Gráfico en cascada Descripción generada automáticamente](media/001728098313718d10e034f3c6aa5c54.png)
 
-**Conclusiones**
+**Conclusions**
+This study presents a novel hardware-based solution characterised by scalability, affordability and replicability, while maintaining the high accuracy typical of professional-level solutions. The system uses open source software both in the microcontroller firmware and in the processing phase. This processing software is based on the NILMTK toolkit and is adapted to accommodate a new data set generated by this new hardware.
 
-Este estudio presenta una novedosa solución basada en hardware caracterizada por la escalabilidad, la asequibilidad y la replicabilidad, al tiempo que mantiene la alta precisión típica de las soluciones de nivel profesional. El sistema emplea software de código abierto tanto en el firmware del microcontrolador como en la fase de procesamiento. Este software de procesamiento se basa en el kit de herramientas NILMTK y está adaptado para dar cabida a un nuevo conjunto de datos generado por este nuevo hardware.
 
-Un aspecto destacable de este trabajo es el desarrollo de un nuevo convertidor adaptado a los archivos de medición OMPM. Este convertidor crea un nuevo conjunto de datos que admite una marca de tiempo de 13 dígitos, lo que facilita la aplicación de las diversas fases de NILMTK, incluida la validación, el entrenamiento y la evaluación de métricas
+A highlight of this work is the development of a new converter adapted to the OMPM measurement files. This converter creates a new dataset that supports a 13-digit timestamp, which facilitates the implementation of the various phases of NILMTK, including validation, training and evaluation of metrics.
+.
+
+Significant differences emerge when comparing the results obtained from applying NILMTK metrics to the OMPM dataset with those derived from the DEPS dataset (generated with professional hardware). In particular, the OMPM dataset requires shorter sampling times and exhibits a remarkable 200% difference in RMSE metrics compared to the DEPS dataset.
+
+
+The promising results obtained with the OMPM dataset using NILMTK metrics open up new possibilities for researchers to generate their datasets and further enhance NILM research. The scalability of the proposed solution, facilitated by the implementation of an RS485 bus, allows the use of multiple channels with a single microcontroller. This scalability guarantees the capture of all fundamental electrical measurements with commendable accuracy. Having been successfully evaluated with six modules, the number of circuits in a typical household, the system has the potential for future expansion to accommodate even more modules.
 
 .
 
-Surgen diferencias significativas cuando se comparan los resultados obtenidos de la aplicación de métricas de NILMTK al conjunto de datos OMPM con los derivados del conjunto de datos DEPS (generado con hardware profesional). En particular, el conjunto de datos OMPM requiere tiempos de muestreo más cortos y exhibe una notable diferencia del 200% en la métrica RMSE en comparación con el conjunto de datos DEPS.
-
-Los prometedores resultados obtenidos con el conjunto de datos OMPM utilizando métricas NILMTK abren nuevas posibilidades para que los investigadores generen sus conjuntos de datos y mejoren aún más la investigación de NILM. La escalabilidad de la solución propuesta, facilitada por la implementación de un bus RS485, permite el uso de múltiples canales con un solo microcontrolador. Esta escalabilidad garantiza la captura de todas las mediciones eléctricas fundamentales con una precisión encomiable. Después de haber sido evaluado con éxito con seis módulos, el número de circuitos en un hogar tí-pico, el sistema tiene el potencial de expansión futura para acomodar aún más módulos
-
-.
-
-Para evaluar este nuevo hardware, se eligieron aplicaciones con bajo consumo de energía para aumentar la complejidad de las tareas de desagregación. El hardware arrojó resultados altamente satisfactorios en varias métricas, lo que sugiere su utilidad potencial en la investigación en curso de NILM. El trabajo futuro podría centrarse en mejorar la precisión de los módulos de medición. Actualmente, cada módulo se alimenta directamente de la tensión de red mediante un circuito RC simple, un diodo rectificador y un diodo Zener, con un regulador U3 (7133) en la salida. Se podría lograr una mejora alimentando el regulador a partir de una fuente aislada e independiente, como un R05P125, que ofrece una dirección prometedora para una mayor investigación y desarrollo.
+To evaluate this new hardware, low-power applications were chosen to increase the complexity of disaggregation tasks. The hardware performed highly satisfactorily on several metrics, suggesting its potential usefulness in NILM's ongoing research. Future work could focus on improving the accuracy of the measurement modules. Currently, each module is powered directly from the mains voltage by a simple RC circuit, a rectifier diode and a Zener diode, with a U3 (7133) regulator at the output. An improvement could be achieved by powering the regulator from an isolated, independent source, such as an R05P125, which offers a promising direction for further research and development.
 
 **Publicaciones**
 
-Toda esta documentación referida al OMPM esta publicada en la revista científica “Inventions:”
+
+All this documentation concerning the OMPM is published in the scientific journal "Inventions:".
 
 -   C. Rodríguez-Navarro, F. Portillo, F. Martínez, F. Manzano-Agugliaro, and A. Alcayde, “Development and Application of an Open Power Meter Suitable for NILM,” *Inventions*, vol. 9, no. 1, p. 2, Dec. 2023, doi: 10.3390/inventions9010002.
 
-Hay un artículo de mi autoría sobre el NILM pero que usa el hardware OZM en lugar del OMPM:
+There is an article I have written about NILM but it uses OZM hardware instead of OMPM:
 
 -   C. Rodriguez-Navarro, A. Alcayde, V. Isanbaev, L. Castro-Santos, A. Filgueira-Vizoso, and F. G. Montoya, “DSUALMH- A new high-resolution dataset for NILM,” *Renewable Energy and Power Quality Journal*, vol. 21, no. 1, pp. 238–243, Jul. 2023, doi: 10.24084/repqj21.286.
 
