@@ -2,7 +2,7 @@
 
 By Carlos Rodriguez Navarro
 
-Febrero de 2023
+February of 2023
 
 
 ** **This excerpt refers to a paper by me on the OMPM published in the scientific journal "Inventions:" C. Rodríguez-Navarro, F. Portillo, F. Martínez, F. Manzano-Agugliaro, and A. Alcayde, "Development and Application of an Open Power Meter Suitable for NILM," *Inventions*, vol. 9, no. 1, p. 2, Dec. 2023, doi: doi: doi: 2023. Alcayde, "Development and Application of an Open Power Meter Suitable for NILM," *Inventions*, vol. 9, no. 1, p. 2, Dec. 2023, doi: 10.3390/inventions9010002.*** * *
@@ -41,15 +41,18 @@ The microcontroller used is an **ESP32 Node MCU** , to which an SD card adapter 
 
 In the following image we can see in detail the connection of the SD adapter to the ESP32 controller.
 
+
 ![](media/95a984ea364d84b5722a0738826053ba.jpeg)
 
 Illustration 1-Detail of SD Reader connections
+
 
 ![Un cable conectado Descripción generada automáticamente con confianza baja](media/dde465bc04f80c26e51d6687c0b4138c.jpeg)
 
 Illustration 2- Detail of sd reader connection to the ESP32
 
-The measurement module PZEM004 measures the 5 fundamental electrical characteristics such as RMS voltage, RMS current, Active power and Energy with opto-coupled outputs and serial communication (comes with TTL serial interface, through various terminals to communicate with the adapter board, read, and set the parameters)..
+The measurement module PZEM004 measures the 5 fundamental electrical characteristics such as RMS voltage, RMS current, Active power and Energy with opto-coupled outputs and serial communication (comes with TTL serial interface, through various terminals to communicate with the adapter board, read, and set the parameters).
+
 
 ![Diagrama Descripción generada automáticamente](media/29c05c1b3c1e873fb0034f5742c08680.png)
 
@@ -67,6 +70,7 @@ The multi-function meter module PZEM-004T allows to measure the RMS voltage, RMS
 
 
 This is the schematic of the final circuit that has been implemented (the display is optional):
+
 
 ![Diagrama, Esquemático Descripción generada automáticamente](media/1de64d7c0fd30edd30c24c10199d1c45.png)
 
@@ -173,6 +177,7 @@ Based on the DSUAL converter, a new converter called UALM2 has been created to g
 
 This is the scheme of the assembly obtained in step 2:
 
+
 ![Un papalote volando en el cielo Descripción generada automáticamente con confianza media](media/4fac1900871270e673dd2b4433d696eb.png)
 
 
@@ -181,21 +186,25 @@ This is the fraction of consumption calculated for each appliance:
 ![Gráfico, Gráfico circular Descripción generada automáticamente](media/994c0cc11436aa28dba703577b8d57ed.png)
 
 We can graphically display voltage, frequency, active power and current for all applications, e.g. aggregate:
+
 ![Gráfico, Gráfico de barras Descripción generada automáticamente](media/e92be0d595add001a0098124e5838fd8.png)
 
 It is very interesting to see how all the measurements are recorded, where it can be seen how in the first hour the 32 possibilities are recorded in sequential order and in the second hour it was randomised:
+
 ![Gráfico, Histograma Descripción generada automáticamente](media/5b2a0c53c52473bb4364cbc0ccc27be2.png)
 
 Illustration 5-Representation of the power of all counters on the timeline
 
 
 As a first step we obtain a first estimation of the performance of the two algorithms, which in principle gives us an indication that the sampling time to be selected will be small:
+
 ![Tabla Descripción generada automáticamente](media/98d6726bbbb3caa779a2d02e64719d29.png)
 
 Illustration 6- Preliminary execution data
 
 
 The result already using many more sampling periods, the two algorithms CO and FHMM and the three different filling methods gives the following results:
+
 ![Tabla Descripción generada automáticamente](media/685c4fa1d67c18be26675cbee8024419.png)
 
 Figure 7 - Results running three methods, two algorithms and times
@@ -218,12 +227,14 @@ Figure 9 - Percentage of unbundled energy
 
 
 Now we will see the comparison between the actual and the estimated signal, which is not very good data.
+
 ![Gráfico, Gráfico circular Descripción generada automáticamente](media/a3e60b52977dbf89f475902489eba36e.png)
 
 Illustration 10- Comparison of Actual Data and Predictions
 
 
 Finally, applying the NILMTK metrics we obtain the following results for the F1, EAE, MNEAP and RMSE measures:
+
 ![Tabla Descripción generada automáticamente](media/c21600607d4593a579e547605867d813.png)
 
 Illustration 11-Metric results
@@ -234,17 +245,21 @@ For metric F1, very good values are obtained for the fan, laptop (which is even 
 ![Interfaz de usuario gráfica, Gráfico, Aplicación, Gráfico de líneas Descripción generada automáticamente](media/d349c1948922f43aa96dc605411fa456.png)
 
 The MNEAP metric also gives very good values, the best being undoubtedly for the halogen lamp. The worst figure is again for the TV.
+
 ![Imagen que contiene Interfaz de usuario gráfica Descripción generada automáticamente](media/3a385dc52679ed386b45d91c39de9a6d.png)
 
  
 
 On the RMSE metric this time the data is very good for all applications.
+
 ![Interfaz de usuario gráfica Descripción generada automáticamente con confianza baja](media/eb97b8255da1a33a72fce82a04fd6024.png)
 
 Let us now look at the average l for the 4 metrics and the different sampling periods:
+
 ![Tabla Descripción generada automáticamente](media/b9dbd1f467a30c1f4ddda0c4cc273369.png)
 
 Let us now look at the different maximum results for the 4 metrics and the different applications:
+
 ![Tabla Descripción generada automáticamente](media/f94c5322b359501847b3e8e26a5f4ca1.png)
 
 This is the index correspondence:
@@ -259,25 +274,26 @@ The very poor value for the F1 metric with respect to the TV using the three dif
 
 
 Finally, let's look at the results obtained for the different metrics and the different applications, observing again how for the fan we have no values.
+
 ![Gráfico, Gráfico en cascada Descripción generada automáticamente](media/001728098313718d10e034f3c6aa5c54.png)
 
 **Conclusions**
+
 This study presents a novel hardware-based solution characterised by scalability, affordability and replicability, while maintaining the high accuracy typical of professional-level solutions. The system uses open source software both in the microcontroller firmware and in the processing phase. This processing software is based on the NILMTK toolkit and is adapted to accommodate a new data set generated by this new hardware.
 
 
 A highlight of this work is the development of a new converter adapted to the OMPM measurement files. This converter creates a new dataset that supports a 13-digit timestamp, which facilitates the implementation of the various phases of NILMTK, including validation, training and evaluation of metrics.
-.
+
 
 Significant differences emerge when comparing the results obtained from applying NILMTK metrics to the OMPM dataset with those derived from the DEPS dataset (generated with professional hardware). In particular, the OMPM dataset requires shorter sampling times and exhibits a remarkable 200% difference in RMSE metrics compared to the DEPS dataset.
 
 
 The promising results obtained with the OMPM dataset using NILMTK metrics open up new possibilities for researchers to generate their datasets and further enhance NILM research. The scalability of the proposed solution, facilitated by the implementation of an RS485 bus, allows the use of multiple channels with a single microcontroller. This scalability guarantees the capture of all fundamental electrical measurements with commendable accuracy. Having been successfully evaluated with six modules, the number of circuits in a typical household, the system has the potential for future expansion to accommodate even more modules.
 
-.
 
 To evaluate this new hardware, low-power applications were chosen to increase the complexity of disaggregation tasks. The hardware performed highly satisfactorily on several metrics, suggesting its potential usefulness in NILM's ongoing research. Future work could focus on improving the accuracy of the measurement modules. Currently, each module is powered directly from the mains voltage by a simple RC circuit, a rectifier diode and a Zener diode, with a U3 (7133) regulator at the output. An improvement could be achieved by powering the regulator from an isolated, independent source, such as an R05P125, which offers a promising direction for further research and development.
 
-**Publicaciones**
+**Publications**
 
 
 All this documentation concerning the OMPM is published in the scientific journal "Inventions:".
