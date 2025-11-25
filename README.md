@@ -5,7 +5,7 @@ By Carlos Rodriguez Navarro
 February of 2023
 
 
-** **This excerpt refers to a paper by me on the OMPM published in the scientific journal "Inventions:" C. Rodríguez-Navarro, F. Portillo, F. Martínez, F. Manzano-Agugliaro, and A. Alcayde, "Development and Application of an Open Power Meter Suitable for NILM," *Inventions*, vol. 9, no. 1, p. 2, Dec. 2023, doi: doi: doi: 2023. Alcayde, "Development and Application of an Open Power Meter Suitable for NILM," *Inventions*, vol. 9, no. 1, p. 2, Dec. 2023, doi: 10.3390/inventions9010002.*** * *
+** This excerpt refers to a paper by me on the OMPM published in the scientific journal "Inventions:" C. Rodríguez-Navarro, F. Portillo, F. Martínez, F. Manzano-Agugliaro, and A. Alcayde, "Development and Application of an Open Power Meter Suitable for NILM," *Inventions*, vol. 9, no. 1, p. 2, Dec. 2023, doi: doi: doi: 2023. Alcayde, "Development and Application of an Open Power Meter Suitable for NILM," *Inventions*, vol. 9, no. 1, p. 2, Dec. 2023, doi: 10.3390/inventions9010002.**
 
 
 
